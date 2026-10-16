@@ -49,7 +49,7 @@ def launch_setup():
             sl.node('pose_to_tf',parameters={'child_frame': ns+'/base_link_gt'})
 
         # imu
-        for imu in ('mpu', 'lsm'):
+        for imu in ('imu',):
             bridges.append(GazeboBridge(f'{ns}/{imu}',
                           imu, 'sensor_msgs/Imu', GazeboBridge.gz2ros))
 
