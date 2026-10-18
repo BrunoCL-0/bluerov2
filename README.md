@@ -8,7 +8,7 @@ This repository contains the robot description and necessary launch files to des
 # Fork do projeto de corais: simulação em Docker (ROS 2 Jazzy + Gazebo Harmonic)
 
 Esta branch (`feat/coral-world`) adiciona um Docker pronto para rodar o BlueROV2 no Gazebo
-Harmonic, mais um mundo subaquático com fundo de areia (`coral_world`) para a gente colocar
+Harmonic, mais um mundo subaquático com fundo de areia (`coral_world_textura`) para a gente colocar
 os corais. Tudo abaixo foi escrito para quem **nunca rodou isso**: siga os passos na ordem.
 
 > O Dockerfile original deste repositório (raiz, `build_docker.sh`/`run_docker.sh`) usa ROS 2
@@ -28,6 +28,7 @@ os corais. Tudo abaixo foi escrito para quem **nunca rodou isso**: siga os passo
   docker run --rm hello-world     # teste: deve imprimir "Hello from Docker!"
   ```
 - `xhost` (abre a janela do Gazebo na sua tela): `sudo apt install x11-xserver-utils`
+- `python3` e `python3-venv` (para o passo das fotos): `sudo apt install python3 python3-venv`
 - ~10 GB livres em disco e internet (a imagem final ocupa ~5 GB; o download de pacotes do ROS e do Gazebo é grande).
 - GPU NVIDIA é **opcional**. Sem ela a renderização é feita pela CPU: funciona, mas é mais lenta.
 
@@ -37,6 +38,18 @@ os corais. Tudo abaixo foi escrito para quem **nunca rodou isso**: siga os passo
 git clone -b feat/coral-world https://github.com/BrunoCL-0/bluerov2.git
 cd bluerov2
 ```
+
+Os corais 3D (`.glb`, CC0) já vêm no repositório. As **fotos** de coral usadas por alguns mundos vêm de datasets do Kaggle
+sem licença clara e por isso **não** estão no repositório: um script as baixa (sem login, ~60 MB) e monta as pastas.
+Rode **uma vez**, no seu computador (fora do container), na raiz do repositório:
+
+```bash
+./scripts/setup_assets.sh
+```
+
+Ele cria um ambiente virtual em `.venv-assets/` (não mexe no Python do sistema) e as pastas
+`bluerov2_description/models/coral_textures/` e `models/coral_textures_prova/`, ambas ignoradas pelo git. Sem esse
+passo os mundos carregam normalmente, mas os planos de foto ficam sem imagem.
 
 ## Passo 2: construir a imagem Docker (uma vez; 20 a 40 min dependendo da internet)
 
@@ -67,13 +80,13 @@ aparece dentro dele em `/ws/src/bluerov2`: você edita os arquivos no computador
 cd /ws
 colcon build
 source install/setup.bash
-ros2 launch bluerov2_description coral_world_launch.py
+ros2 launch bluerov2_description coral_world_textura_launch.py
 ```
 
 Deve abrir a janela do Gazebo com o fundo de areia e o robô. Para parar: `Ctrl+C`.
 
-- Sem janela (só o servidor): `ros2 launch bluerov2_description coral_world_launch.py gui:=false`
-- Mudar a profundidade em que o robô nasce: `... coral_world_launch.py depth:=-8.`
+- Sem janela (só o servidor): `ros2 launch bluerov2_description coral_world_textura_launch.py gui:=false`
+- Mudar a profundidade em que o robô nasce: `... coral_world_textura_launch.py depth:=-8.`
 - Mundo vazio original (só água): `ros2 launch bluerov2_description world_launch.py`
 
 Depois de **editar** algum arquivo do pacote (mundo, xacro, launch), rode de novo
@@ -102,14 +115,49 @@ Suba o mundo **sem** o robô e spawne o robô com sliders:
 
 ```bash
 # Terminal 1
-ros2 launch bluerov2_description coral_world_launch.py spawn:=false
+ros2 launch bluerov2_description coral_world_textura_launch.py spawn:=false
 # Terminal 2 (docker exec ...)
 ros2 launch bluerov2_description upload_bluerov2_launch.py sliders:=true z:=-5.
 ```
 
 Aparece uma janela com um slider por propulsor (±40 N) e outro para inclinar a câmera.
 
-## O que existe no mundo `coral_world`
+## Controlar o robô pelo teclado e ver a câmera
+
+Cada comando vai num terminal **separado**, dentro do container. Para abrir outro terminal no mesmo container,
+rode no seu computador: `docker exec -it bluerov2_harmonic bash`. O mundo precisa estar rodando (Terminal 1).
+Sem o controlador (Terminal 2) o robô **sobe sozinho** até a superfície, porque tem flutuabilidade levemente positiva.
+
+**Terminal 2: controlador PID** (transforma velocidade em comando dos propulsores e segura a profundidade):
+```bash
+ros2 launch bluerov2_control cascaded_pids_launch.py sliders:=false rviz:=false
+```
+
+**Terminal 3: teclado** (o repo não traz teleop; o pacote vem do apt e **precisa ser reinstalado toda vez que o
+container é recriado pelo `./run.sh`**):
+```bash
+apt-get update && apt-get install -y ros-jazzy-teleop-twist-keyboard
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=/bluerov2/cmd_vel \
+  -p stamped:=true -p frame_id:=bluerov2/base_link -p speed:=0.3 -p turn:=0.5
+```
+Teclas, com esse terminal em foco: `i` frente, `,` ré, `j`/`l` gira esquerda/direita, `u`/`o` frente girando,
+`J`/`L` (shift) andam de lado, `t` sobe, `b` desce, `k` para, `q`/`z` aumentam/diminuem a velocidade em 10%.
+
+**Terminal 4: inclinar a câmera para baixo** (positivo olha para baixo; limite ±1,05 rad):
+```bash
+ros2 topic pub -r 10 /bluerov2/cmd_tilt std_msgs/msg/Float64 "{data: 0.9}"
+```
+
+**Terminal 5: ver a imagem da câmera:**
+```bash
+ros2 run rqt_image_view rqt_image_view /bluerov2/image
+```
+
+Testado: com o PID ligado, publicar velocidade em `/bluerov2/cmd_vel` move o robô (0,3 m/s andou ~2,3 m em 8 s), e o
+tópico `/bluerov2/image` publica a ~17 a 20 Hz. **Não testado:** o teleop com teclado de verdade, o sentido de cada
+tecla e a janela do `rqt_image_view`.
+
+## O que existe no mundo `coral_world_textura`
 
 | Elemento | Posição (z, em metros) |
 |---|---|
@@ -121,6 +169,130 @@ Aparece uma janela com um slider por propulsor (±40 N) e outro para inclinar a 
 O fundo tem 50 × 50 m e relevo de ~2,5 m. O robô tem flutuabilidade levemente positiva
 (+1% por lado da caixa de empuxo, definido no xacro): sem propulsores ele **sobe devagar** até
 a superfície. É esperado. Com o controlador PID ele mantém a profundidade.
+
+## Texturas de coral (Teste A)
+
+O mundo `coral_world_textura` tem 8 planos de ~0,6 m sobre trechos planos do fundo, cada um com uma
+foto de coral (4 saudáveis, 2 vermelhos e 2 verdes, e 4 branqueados). As fotos são criadas por
+`./scripts/setup_assets.sh` (veja o Passo 1) em `bluerov2_description/models/coral_textures/`. Depois, no container,
+rode `colcon build` e `source install/setup.bash` de novo para as fotos serem instaladas.
+Para criar só estas fotos, à mão: `python3 scripts/setup_coral_textures.py --download` (requer `pillow` e `kagglehub`).
+
+Os planos ficam em x = 3 a 7,3 m e y = −6 a 4,5 m (o robô nasce em x = 1, y = 0, olhando para +x).
+Para ver um plano com a câmera, aproxime o robô do fundo e incline a câmera para baixo
+(`ros2 topic pub -r 10 /bluerov2/cmd_tilt std_msgs/msg/Float64 "{data: 0.9}"`).
+
+Limitações: as fotos têm 227 a 300 px (ficam borradas se ampliadas), a cena não tem atenuação de cor
+da água, e uma foto em plano não é um coral em 3D. Serve para validar o pipeline, não a acurácia.
+Os datasets são de classificação, sem caixas delimitadoras, e há imagens repetidas e algumas que
+não são coral.
+
+## Mundo recife (aglomerados de corais 3D)
+
+`coral_world_recife` tem **96 colônias** de 8 espécies de coral 3D do Smithsonian (CC0) espalhadas
+em **9 aglomerados** sobre trechos planos do fundo, mais **8 colônias isoladas**. As cores são
+aplicadas por imagem no SDF, em cima de uma malha única por espécie. Aglomerados:
+
+| Aglomerado | O que tem |
+|---|---|
+| 01 `branco` | só colônias brancas (branqueadas) |
+| 02 `vermelho`, 03 `verde`, 04 `marrom` | uma cor por aglomerado, várias espécies |
+| 05 `azul_roxo` | azul e roxo |
+| 06 `cores_misturadas` | vermelho, verde, marrom, roxo, rosa e amarelo juntos |
+| 07 `saudavel_com_branqueados` | maioria colorida com ~25% branqueadas |
+| 08 `parcial_branqueando` | colônias verdes, marrons e vermelhas com **manchas brancas** |
+| 09 `multicolor` | colônias com **manchas de várias cores** |
+| `isolados` | 8 colônias soltas, bem separadas |
+
+Objetos no SDF: `recife_aglomerado<NN>_<tipo>__<especie>__<cor>__<n>` e `recife_isolado__...`.
+Espécies: *Acropora cervicornis*, *A. palmata*, *Seriatopora hystrix*, *Pseudodiploria strigosa*,
+*Leptoseris gardineri*, *Heliopora coerulea*, *Meandrina meandrites* e *Pocillopora damicornis*
+([links no topo de `scripts/setup_coral_recife.py`](scripts/setup_coral_recife.py)).
+
+As malhas (`bluerov2_description/models/coral_recife/*.glb`, ~44 MB) e as 15 texturas de cor (`models/coral_recife_tex/`,
+geradas por ruído, sem material de terceiros) **já estão no repositório**; não há nada para baixar. Origem e licença das
+malhas em [models/coral_recife/README.md](bluerov2_description/models/coral_recife/README.md).
+
+Para rodar, no container: `colcon build`, `source install/setup.bash` e
+`ros2 launch bluerov2_description coral_world_recife_launch.py depth:=-8.`
+
+Para **recriar as malhas do zero** (só manutenção): baixe os 8 modelos no Sketchfab em `.glb` (exige login), salve como
+`acropora_palmata.glb`, `seriatopora_hystrix.glb` etc. numa pasta e rode
+`pip install pillow numpy && python3 scripts/setup_coral_recife.py --input <essa pasta>`.
+
+`python3 scripts/make_world_recife.py` regenera o SDF (semente fixa; `--seed N` muda a disposição).
+Os aglomerados ficam entre x = 4 e 22 m e |y| até ~21 m; o robô nasce em x = 1, y = 0.
+
+Limitações: as cores "saudáveis" são sintéticas (os originais são esqueletos de museu), as texturas
+são ruído colorido (sem o detalhe de superfície do original, então os corais parecem recortes
+lisos), os tamanhos são estimativas (a fonte não informa) e a orientação "natural" de cada
+espécie não foi verificada. Em teste sem janela, com 96 colônias, a câmera ficou a ~12 Hz.
+
+## Mundo de prova (fotos e corais 3D no mesmo mundo, com morros)
+
+Pensado para avaliar um detector treinado com as fotos reais dos datasets, **sem depender de como o YOLO
+será feito** (detecção ou classificação, versão, resolução). `coral_world_prova` tem o fundo **com morros** e dois
+conjuntos de espécimes, cada um com as 5 situações abaixo (**32 espécimes por conjunto, 64 no total**; a versão completa, com 70
+por conjunto, é mais pesada e sai com `--completo`):
+
+| Conjunto | Onde | O que é |
+|---|---|---|
+| `imagem_P001...P032` | zona y < 0 (à direita do robô) | planos de 0,6 m com **foto real** dos datasets |
+| `cad_P001...P032` | zona y > 0 (à esquerda) | **corais 3D**, cores medidas nas fotos do dataset |
+
+O mesmo `id` tem a mesma situação e a mesma classe nos dois conjuntos (o `P007` de foto e o `P007` 3D), mas **não a
+mesma posição**: cada conjunto fica numa zona do fundo. Cada situação é uma faixa de voo ao longo de x:
+
+| Situação | O que é | Classe de verdade |
+|---|---|---|
+| `s1_controle` | 6 isolados, espaçamento regular de 2 m | 3 saudáveis + 3 branqueados |
+| `s2_intercalados` | 6 isolados, espaçamento e posição lateral aleatórios | 3 + 3 |
+| `s3a_aglom_puro` | 2 aglomerados de 4, cada um de uma classe só | 1 de saudáveis + 1 de branqueados |
+| `s3b_aglom_misto` | 2 aglomerados de 4 com as duas classes juntas | 3+1 e 1+3 |
+| `s4_dificil` | 4 isolados com branqueamento parcial | `ambiguo` (reportar à parte) |
+
+**Como ficam sobre os morros.** Um plano de foto só pode ficar em chão plano, então cada foto vai para o trecho plano mais
+próximo da posição ideal (o gerador também procura onde pôr a zona das fotos para esse deslocamento ser pequeno). Os
+corais 3D ficam exatamente na posição ideal, assentados pelo ponto mais baixo sob a base. Por isso as faixas das fotos
+são **aproximadas**: deslocamento médio de 0,8 m e máximo de 1,9 m, registrado em `desloc_m`. Em chão inclinado, parte do
+coral 3D pode ficar enterrada.
+
+**Verdade de terreno** em `bluerov2_description/worlds/`: `prova_manifesto.csv` (uma linha por espécime, com `tipo`
+imagem/cad, posição real e ideal, `desloc_m`, foto de origem, rótulo do dataset, espécie e textura) e
+`prova_manifesto_misto.json` (contagens, zonas e **caminho de voo sugerido acompanhando o relevo**, 1,5 m acima do
+ponto mais alto de cada trecho; o caminho não foi testado com o robô).
+
+**Altura sugerida: 1,5 m acima do fundo.** Com a câmera do robô (640 px, campo de 60°), um plano de 0,6 m ocupa ~220 px,
+quase o tamanho nativo das fotos (227 a 300 px). Os morros sobem até ~2,5 m, então voar a altura fixa bate neles.
+
+Para criar as fotos: `./scripts/setup_assets.sh` (Passo 1). Ele copia **exatamente** as fotos listadas em
+`prova_manifesto.csv`, sem sortear nada de novo. As malhas dos corais 3D já vêm no repositório (veja "Mundo recife").
+
+No container: `colcon build`, `source install/setup.bash` e
+`ros2 launch bluerov2_description coral_world_prova_launch.py`. Para manter o robô na profundidade, use o
+controlador PID e o teleop de teclado.
+
+**Evitar vazamento de dados.** Quando a divisão treino/validação/teste for definida, salve os nomes das imagens
+de treino num `treino.txt` (uma por linha) e, **para quem mantém o mundo**, regenere-o (muda as fotos sorteadas, o SDF e o
+manifesto) com `pip install pillow numpy` e `python3 scripts/make_world_prova.py --datasets datasets --excluir treino.txt`.
+Hoje a divisão é desconhecida. `--pool A` ou `--pool B` usa só um dataset (útil para o teste entre datasets).
+Mudar `--seed` muda o sorteio.
+
+**Como as fotos foram escolhidas.** Sorteio com semente fixa, sem duplicatas (hash perceptual). Depois, curadoria
+**visual, imagem por imagem**: foram rejeitadas as com marca d'água ("WILD Singapore" e outras), mergulhador, desenho digital
+e o que não é coral (estrela-do-mar, anêmona com peixe-palhaço, couve ornamental). As 30 fotos de branqueado e as 10 de
+branqueamento parcial foram **escolhidas à mão** (listas no topo de `scripts/make_world_prova.py`).
+
+**Limitações (leia antes de interpretar resultados):**
+- Os rótulos "saudável/branqueado" são os dos datasets, que têm ruído. Algumas fotos "saudáveis" são cenas de recife
+  inteiras, com peixes, e não colônias isoladas. A classe `ambiguo` não foi validada por especialista.
+- A paleta dos corais 3D sai de um agrupamento de cores das fotos saudáveis; como as fotos incluem rocha, sombra e
+  água, ela é **apagada e escura** (marrons, oliva, verde-mar), de pouco contraste com a areia, enquanto os
+  branqueados são brancos. Isso pode misturar "visibilidade" com "classe" no resultado.
+- A cena é escura (hipótese não verificada: o plano de água projeta sombra) e não tem a tinta azul-esverdeada
+  da água das fotos reais. A diferença de aparência entre foto e 3D é parte do que a prova mede, mas não é controlada.
+- Fotos em planos são cenas planas, não corais em 3D; os corais 3D são esqueletos recoloridos.
+- Com morros, a altura e a oclusão variam ao longo da faixa, o que dificulta comparar foto e 3D posição a posição.
 
 ## Problemas comuns
 
@@ -136,7 +308,7 @@ a superfície. É esperado. Com o controlador PID ele mantém a profundidade.
 ## O que foi testado e o que não foi
 
 Testado (Ubuntu 22.04, container Jazzy + Harmonic 8.15, renderização por CPU):
-build da imagem; `colcon build` dos dois pacotes; mundo `coral_world` com a janela do Gazebo
+build da imagem; `colcon build` dos dois pacotes; mundo `coral_world_textura` com a janela do Gazebo
 mostrando a areia; tópicos `/bluerov2/image` (~19 Hz), `imu` (10 Hz), `pose_gt` e `odom`;
 propulsores movendo o robô.
 
@@ -149,10 +321,26 @@ propulsores movendo o robô.
 - `urdf/demo_world.sdf`: plugins renomeados para a sintaxe `gz-sim-*` (Harmonic).
 - `launch/upload_bluerov2_launch.py`: o bridge de IMU agora usa o sensor `imu`
   (antes procurava `mpu` e `lsm`, que não existem mais no xacro).
-- `worlds/coral_world.sdf`, `launch/coral_world_launch.py`, `models/sand_heightmap/`: mundo com
+- `worlds/coral_world_textura.sdf`, `launch/coral_world_textura_launch.py`, `models/sand_heightmap/`: mundo com
   fundo de areia. `CMakeLists.txt` passa a instalar `models` e `worlds`.
+- `scripts/setup_assets.sh`, `scripts/setup_coral_textures.py`, `scripts/setup_photos_prova.py`: baixam os datasets de fotos
+  e montam as pastas de fotos dos mundos (as fotos ficam fora do git).
+- `worlds/coral_world_recife.sdf`, `launch/coral_world_recife_launch.py`, `scripts/setup_coral_recife.py`,
+  `scripts/make_world_recife.py`: aglomerados de 96 corais 3D (8 espécies) em várias cores.
+- `worlds/coral_world_prova.sdf`, `launch/coral_world_prova_launch.py`,
+  `worlds/prova_manifesto*`, `scripts/make_world_prova.py`: corpos de prova (foto e 3D) com verdade de terreno.
+- `models/coral_recife/` (malhas 3D CC0) e `models/coral_recife_tex/` (texturas de cor procedurais).
 
-## Créditos e licenças do fundo de areia
+## Créditos e licenças
+
+**Corais 3D:** os 8 modelos de `models/coral_recife/` são do Smithsonian Institution (Museu Nacional de História
+Natural), em domínio público (CC0 1.0). Lista, links e alterações feitas em `models/coral_recife/README.md`. Cite a fonte no artigo.
+
+**Fotos de coral:** vêm dos datasets do Kaggle `vencerlanz09/healthy-and-bleached-corals-image-classification` e
+`sonainjamil/bleached-corals-detection` (artigo associado: Jamil et al., 2021, *Big Data and Cognitive Computing* 5(4):53).
+Não estão no repositório e a licença de cada foto não foi verificada; confira os termos antes de redistribuí-las.
+
+**Fundo de areia:**
 
 `models/sand_heightmap/` foi copiado de https://github.com/clydemcqueen/bluerov2_gz (projeto
 que declara MIT no `package.xml`), cujo `model.sdf` traz o cabeçalho do UUV Simulator
