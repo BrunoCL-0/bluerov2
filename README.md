@@ -299,21 +299,26 @@ branqueamento parcial foram **escolhidas à mão** (listas no topo de `scripts/m
 | Sintoma | Causa provável / o que fazer |
 |---|---|
 | Janela não abre, "cannot connect to display" ou "Authorization required" | Rode `xhost +local:docker` **no seu computador** e abra o container de novo. Confirme que `echo $DISPLAY` não está vazio (não testado em sessão Wayland pura). |
+| Gazebo não abre a renderização: `Failed to create dummy render window`, `OpenGL 3.3 is not supported` ou `eglInitialize failed` | Costuma ser notebook com Intel + NVIDIA: o container não traz o driver da NVIDIA. O `./run.sh` já expõe só as placas que não são NVIDIA (Intel/AMD). Se ainda falhar, confira com `ls /dev/dri` e `ls /sys/class/drm`. `./run.sh --gpu` expõe todas e exige o `nvidia-container-toolkit` (não testado). |
 | `permission denied ... docker.sock` | Seu usuário não está no grupo `docker` (veja "O que você precisa"). |
 | Log repete `Requesting list of world names` | O Gazebo não subiu. Procure o primeiro `[Err]` ou `died` mais acima no log (p. ex. arquivo de modelo não encontrado). |
-| Muito lento | Renderização por CPU. Use `gui:=false` para testes ou instale o `nvidia-container-toolkit` e rode `./run.sh --gpu` (não testado). |
+| Muito lento | A janela do Gazebo desenha todos os objetos. Use `gui:=false` para testes, diminua o mundo (`make_world_prova.py` gera a versão leve por padrão) ou use a GPU com `./run.sh --gpu` (não testado). |
 | Dois computadores/containers na mesma rede veem tópicos um do outro | O container usa a rede do host. Defina `export ROS_DOMAIN_ID=<número>` (e `export GZ_PARTITION=<nome>`) diferente em cada um. |
 | Quero recomeçar do zero | No seu computador: `docker rm -f bluerov2_harmonic; docker volume rm bluerov2_build bluerov2_install bluerov2_log` |
 
 ## O que foi testado e o que não foi
 
-Testado (Ubuntu 22.04, container Jazzy + Harmonic 8.15, renderização por CPU):
-build da imagem; `colcon build` dos dois pacotes; mundo `coral_world_textura` com a janela do Gazebo
-mostrando a areia; tópicos `/bluerov2/image` (~19 Hz), `imu` (10 Hz), `pose_gt` e `odom`;
-propulsores movendo o robô.
+Testado (Ubuntu 22.04, container Jazzy + Harmonic 8.15, sem janela, `gui:=false`):
+- **Fluxo completo a partir de um clone limpo**: `git clone` → `./scripts/setup_assets.sh` (21 s) → `./docker/run.sh` →
+  `colcon build` → `coral_world_prova_launch.py`. Sem erros no log, câmera a ~18 Hz, tempo real 1,0, e fotos e corais 3D
+  visíveis na imagem da câmera.
+- Build da imagem; `colcon build` dos dois pacotes; tópicos `/bluerov2/image`, `imu` (10 Hz), `pose_gt` e `odom`;
+  propulsores movendo o robô; com o controlador PID, publicar velocidade em `/bluerov2/cmd_vel` move o robô.
+- A janela do Gazebo foi usada pelo autor em `coral_world_textura` e `coral_world_prova` (a versão antiga do mundo de
+  prova, com 140 objetos, ficou lenta; a atual tem 64).
 
-**Não testado:** `./run.sh --gpu`, os sliders, os controladores PID/sliding mode
-(`bluerov2_control`) e o RViz dentro do Docker, Windows/macOS/WSL.
+**Não testado:** `./run.sh --gpu`, os sliders, o sliding mode, o RViz dentro do Docker, o teleop com teclado de verdade,
+o caminho de voo sugerido no manifesto e Windows/macOS/WSL.
 
 ## O que este fork mudou em relação ao upstream (CentraleNantesROV/bluerov2)
 

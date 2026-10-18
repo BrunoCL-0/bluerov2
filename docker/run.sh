@@ -18,8 +18,25 @@ if [ "$1" = "--gpu" ]; then
   shift
 fi
 
+# Placas de vídeo: o container não traz o driver proprietário da NVIDIA, e em notebooks com Intel + NVIDIA o Gazebo
+# falha ao tentar renderizar pela NVIDIA ("OpenGL 3.3 is not supported"). Por isso, sem --gpu, só as placas que NÃO
+# são NVIDIA são expostas (Intel/AMD usam o Mesa, com aceleração). Com --gpu todas são expostas.
 DRI_ARGS=""
-[ -d /dev/dri ] && DRI_ARGS="--device /dev/dri"
+if [ -d /dev/dri ]; then
+  if [ -n "$GPU_ARGS" ]; then
+    DRI_ARGS="--device /dev/dri"
+  else
+    for c in $(ls /sys/class/drm 2>/dev/null | grep -E '^card[0-9]+$'); do
+      drv="$(basename "$(readlink -f "/sys/class/drm/$c/device/driver" 2>/dev/null)")"
+      [ "$drv" = "nvidia" ] && continue
+      [ -e "/dev/dri/$c" ] && DRI_ARGS="$DRI_ARGS --device /dev/dri/$c"
+      for r in /sys/class/drm/$c/device/drm/renderD*; do
+        [ -e "/dev/dri/$(basename "$r")" ] && DRI_ARGS="$DRI_ARGS --device /dev/dri/$(basename "$r")"
+      done
+    done
+    [ -z "$DRI_ARGS" ] && DRI_ARGS="--device /dev/dri"
+  fi
+fi
 
 # libera a janela do container no seu X11 (precisa do pacote x11-xserver-utils)
 if command -v xhost >/dev/null 2>&1; then
