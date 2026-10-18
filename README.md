@@ -8,8 +8,8 @@ This repository contains the robot description and necessary launch files to des
 # Fork do projeto de corais: simulação em Docker (ROS 2 Jazzy + Gazebo Harmonic)
 
 Esta branch (`feat/coral-world`) adiciona um Docker pronto para rodar o BlueROV2 no Gazebo
-Harmonic, mais um mundo subaquático com fundo de areia (`coral_world_textura`) para a gente colocar
-os corais. Tudo abaixo foi escrito para quem **nunca rodou isso**: siga os passos na ordem.
+Harmonic, mais **três mundos subaquáticos** com fundo de areia e corais (tabela no Passo 4).
+Tudo abaixo foi escrito para quem **nunca rodou isso**: siga os passos na ordem.
 
 > O Dockerfile original deste repositório (raiz, `build_docker.sh`/`run_docker.sh`) usa ROS 2
 > Humble + Gazebo Fortress e foi mantido como está. **Use o da pasta [docker/](docker/)**.
@@ -30,7 +30,8 @@ os corais. Tudo abaixo foi escrito para quem **nunca rodou isso**: siga os passo
 - `xhost` (abre a janela do Gazebo na sua tela): `sudo apt install x11-xserver-utils`
 - `python3` e `python3-venv` (para o passo das fotos): `sudo apt install python3 python3-venv`
 - ~10 GB livres em disco e internet (a imagem final ocupa ~5 GB; o download de pacotes do ROS e do Gazebo é grande).
-- GPU NVIDIA é **opcional**. Sem ela a renderização é feita pela CPU: funciona, mas é mais lenta.
+- GPU NVIDIA é **opcional**. Por padrão o container usa a placa integrada (Intel/AMD) ou a CPU para renderizar; `./run.sh --gpu`
+  (NVIDIA) exige o `nvidia-container-toolkit` e não foi testado.
 
 ## Passo 1: baixar o código
 
@@ -70,6 +71,7 @@ cd bluerov2/docker      # (se ainda não estiver nela)
 ./run.sh
 ```
 
+Atenção: o `./run.sh` **apaga e recria** o container `bluerov2_harmonic`, o que fecha qualquer terminal que já esteja aberto nele.
 Você cai num prompt `root@...:/ws#`. **Todos os comandos dos passos seguintes são digitados
 dentro do container**, a não ser que esteja escrito "no seu computador". O seu repositório
 aparece dentro dele em `/ws/src/bluerov2`: você edita os arquivos no computador normalmente.
@@ -84,6 +86,16 @@ ros2 launch bluerov2_description coral_world_textura_launch.py
 ```
 
 Deve abrir a janela do Gazebo com o fundo de areia e o robô. Para parar: `Ctrl+C`.
+
+**Qual mundo rodar** (troque o nome da launch no comando acima; todos aceitam `gui:=false` e `depth:=-8.`):
+
+| Mundo | Launch | O que é | Precisa das fotos (Passo 1)? |
+|---|---|---|---|
+| `coral_world_textura` | `coral_world_textura_launch.py` | 8 planos com foto de coral sobre a areia. O mais simples para conferir se tudo funciona | sim |
+| `coral_world_recife` | `coral_world_recife_launch.py` | 96 corais 3D em aglomerados de várias cores | não |
+| `coral_world_prova` | `coral_world_prova_launch.py` | corpos de prova com verdade de terreno: 32 fotos e 32 corais 3D, com morros | sim |
+
+Detalhes de cada mundo nas seções abaixo.
 
 - Sem janela (só o servidor): `ros2 launch bluerov2_description coral_world_textura_launch.py gui:=false`
 - Mudar a profundidade em que o robô nasce: `... coral_world_textura_launch.py depth:=-8.`
