@@ -1,0 +1,66 @@
+{
+ "acropora_cervicornis": {
+  "tamanho_m": [
+   0.01579,
+   0.01761,
+   0.0126
+  ],
+  "maior_lado_m": 0.01761
+ },
+ "acropora_palmata": {
+  "tamanho_m": [
+   0.32429,
+   0.27829,
+   0.26376
+  ],
+  "maior_lado_m": 0.32429
+ },
+ "heliopora_coerulea": {
+  "tamanho_m": [
+   0.44039,
+   0.37593,
+   0.2854
+  ],
+  "maior_lado_m": 0.44039
+ },
+ "leptoseris_gardineri": {
+  "tamanho_m": [
+   0.16495,
+   0.14622,
+   0.07556
+  ],
+  "maior_lado_m": 0.16495
+ },
+ "meandrina_meandrites": {
+  "tamanho_m": [
+   0.40282,
+   0.25696,
+   0.3412
+  ],
+  "maior_lado_m": 0.40282
+ },
+ "pocillopora_damicornis": {
+  "tamanho_m": [
+   0.09877,
+   0.06503,
+   0.10622
+  ],
+  "maior_lado_m": 0.10622
+ },
+ "pseudodiploria_strigosa": {
+  "tamanho_m": [
+   0.18767,
+   0.13194,
+   0.16319
+  ],
+  "maior_lado_m": 0.18767
+ },
+ "seriatopora_hystrix": {
+  "tamanho_m": [
+   181.141,
+   179.23635,
+   124.80053
+  ],
+  "maior_lado_m": 181.141
+ }
+}
