@@ -1,0 +1,1214 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="ocean">
+
+    <scene>
+      <grid>false</grid>
+    </scene>
+
+
+    <physics name="10ms" type="ode">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <plugin
+      filename="gz-sim-imu-system"
+      name="gz::sim::systems::Imu">
+    </plugin>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin
+      filename="gz-sim-buoyancy-system"
+      name="gz::sim::systems::Buoyancy">
+      <graded_buoyancy>
+        <default_density>1000</default_density>
+        <density_change>
+          <above_depth>0</above_depth>
+          <density>1</density>
+        </density_change>
+      </graded_buoyancy>
+    </plugin>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.5 0.5 0.5 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="water_plane">
+      <static>true</static>
+      <link name="link">
+        <visual name="water_plane">
+          <geometry>
+            <plane>
+              <size>100 100</size>
+              <normal>0 0 1</normal>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0 0 1 0.5</ambient>
+            <diffuse>0 0 1 0.5</diffuse>
+            <specular>0 0 1 0.5</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <!-- MUNDO DE PROVA MISTO, com morros. Gerado por scripts/make_world_prova.py; não edite à mão.
+         Fotos (objetos imagem_<id>_...) na zona y<0 (faixas em y = -17.5 a -5.5);
+         corais 3D (objetos cad_<id>_...) na zona y>0 (faixas em y = 3.0 a 15.0).
+         O mesmo id (P001...) tem a mesma situação e a mesma classe nas duas zonas.
+         Verdade de terreno em worlds/prova_manifesto.csv. Precisa de arquivos locais fora do git (ver README). -->
+    <include>
+      <uri>model://bluerov2_description/models/sand_heightmap</uri>
+      <name>seabed</name>
+      <pose>0 0 -10.0 0 0 0</pose>
+    </include>
+
+    <model name="imagem_P001_s1_controle_branqueado">
+      <static>true</static>
+      <pose>4.000 -17.500 -9.970 0 0 0.929</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P001.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P002_s1_controle_saudavel">
+      <static>true</static>
+      <pose>6.000 -17.500 -9.988 0 0 5.832</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P002.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P003_s1_controle_branqueado">
+      <static>true</static>
+      <pose>8.000 -17.500 -9.988 0 0 0.442</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P003.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P004_s1_controle_branqueado">
+      <static>true</static>
+      <pose>10.000 -17.500 -9.988 0 0 0.815</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P004.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P005_s1_controle_saudavel">
+      <static>true</static>
+      <pose>11.500 -17.500 -9.969 0 0 5.959</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.408</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P005.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P006_s1_controle_saudavel">
+      <static>true</static>
+      <pose>15.500 -16.500 -9.970 0 0 3.907</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P006.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P007_s2_intercalados_branqueado">
+      <static>true</static>
+      <pose>4.000 -14.500 -9.982 0 0 0.867</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P007.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P008_s2_intercalados_branqueado">
+      <static>true</static>
+      <pose>5.000 -14.250 -9.988 0 0 3.219</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P008.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P009_s2_intercalados_saudavel">
+      <static>true</static>
+      <pose>8.750 -16.000 -9.979 0 0 6.163</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P009.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P010_s2_intercalados_saudavel">
+      <static>true</static>
+      <pose>10.500 -15.250 -9.982 0 0 3.039</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.4</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P010.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P011_s2_intercalados_branqueado">
+      <static>true</static>
+      <pose>12.750 -13.250 -9.988 0 0 1.478</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P011.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P012_s2_intercalados_saudavel">
+      <static>true</static>
+      <pose>14.000 -13.000 -9.964 0 0 0.809</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P012.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P013_s3a_aglom_puro_saudavel">
+      <static>true</static>
+      <pose>4.250 -11.000 -9.980 0 0 2.132</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.4 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P013.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P014_s3a_aglom_puro_saudavel">
+      <static>true</static>
+      <pose>4.500 -9.750 -9.983 0 0 0.106</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.442</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P014.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P015_s3a_aglom_puro_saudavel">
+      <static>true</static>
+      <pose>3.750 -10.250 -9.988 0 0 1.004</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P015.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P016_s3a_aglom_puro_saudavel">
+      <static>true</static>
+      <pose>4.750 -13.250 -9.988 0 0 6.261</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P016.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P017_s3a_aglom_puro_branqueado">
+      <static>true</static>
+      <pose>11.750 -11.250 -9.988 0 0 5.059</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P017.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P018_s3a_aglom_puro_branqueado">
+      <static>true</static>
+      <pose>11.250 -10.500 -9.988 0 0 1.195</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.456</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P018.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P019_s3a_aglom_puro_branqueado">
+      <static>true</static>
+      <pose>12.250 -10.500 -9.988 0 0 0.584</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P019.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P020_s3a_aglom_puro_branqueado">
+      <static>true</static>
+      <pose>12.750 -11.250 -9.988 0 0 0.113</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P020.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P021_s3b_aglom_misto_branqueado">
+      <static>true</static>
+      <pose>5.000 -9.000 -9.988 0 0 4.156</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P021.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P022_s3b_aglom_misto_saudavel">
+      <static>true</static>
+      <pose>4.750 -8.000 -9.988 0 0 4.350</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.45 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P022.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P023_s3b_aglom_misto_saudavel">
+      <static>true</static>
+      <pose>4.000 -8.750 -9.985 0 0 4.908</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.4</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P023.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P024_s3b_aglom_misto_saudavel">
+      <static>true</static>
+      <pose>3.250 -9.250 -9.987 0 0 5.828</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.4</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P024.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P025_s3b_aglom_misto_branqueado">
+      <static>true</static>
+      <pose>10.750 -8.250 -9.988 0 0 0.243</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P025.png</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P026_s3b_aglom_misto_saudavel">
+      <static>true</static>
+      <pose>11.750 -9.000 -9.976 0 0 0.724</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.45 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P026.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P027_s3b_aglom_misto_branqueado">
+      <static>true</static>
+      <pose>11.500 -7.750 -9.988 0 0 3.489</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P027.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P028_s3b_aglom_misto_branqueado">
+      <static>true</static>
+      <pose>10.750 -7.250 -9.988 0 0 4.002</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P028.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P029_s4_dificil_ambiguo">
+      <static>true</static>
+      <pose>3.750 -5.250 -9.985 0 0 2.041</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P029.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P030_s4_dificil_ambiguo">
+      <static>true</static>
+      <pose>5.250 -4.250 -9.982 0 0 4.043</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P030.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P031_s4_dificil_ambiguo">
+      <static>true</static>
+      <pose>9.250 -6.500 -9.988 0 0 2.212</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P031.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="imagem_P032_s4_dificil_ambiguo">
+      <static>true</static>
+      <pose>10.000 -5.500 -9.978 0 0 0.821</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures_prova/P032.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="cad_P001_s1_controle_branqueado">
+      <static>true</static>
+      <pose>5.000 3.000 -10.010 0 0 0.929</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pocillopora_damicornis.glb</uri>
+            <scale>2.9770 2.9770 2.9770</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P002_s1_controle_saudavel">
+      <static>true</static>
+      <pose>7.000 3.000 -10.010 0 0 5.832</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/seriatopora_hystrix.glb</uri>
+            <scale>0.0017 0.0017 0.0017</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c4.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P003_s1_controle_branqueado">
+      <static>true</static>
+      <pose>9.000 3.000 -9.855 0 0 0.442</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/meandrina_meandrites.glb</uri>
+            <scale>1.4740 1.4740 1.4740</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P004_s1_controle_branqueado">
+      <static>true</static>
+      <pose>11.000 3.000 -10.010 0 0 0.815</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/acropora_palmata.glb</uri>
+            <scale>1.5173 1.5173 1.5173</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P005_s1_controle_saudavel">
+      <static>true</static>
+      <pose>13.000 3.000 -10.010 0 0 5.959</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pocillopora_damicornis.glb</uri>
+            <scale>3.7577 3.7577 3.7577</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c2.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P006_s1_controle_saudavel">
+      <static>true</static>
+      <pose>15.000 3.000 -10.010 0 0 3.907</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pseudodiploria_strigosa.glb</uri>
+            <scale>2.3612 2.3612 2.3612</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c5.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P007_s2_intercalados_branqueado">
+      <static>true</static>
+      <pose>5.000 5.775 -9.499 0 0 0.867</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/heliopora_coerulea.glb</uri>
+            <scale>1.0030 1.0030 1.0030</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P008_s2_intercalados_branqueado">
+      <static>true</static>
+      <pose>7.288 6.170 -9.374 0 0 3.219</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pseudodiploria_strigosa.glb</uri>
+            <scale>2.4172 2.4172 2.4172</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P009_s2_intercalados_saudavel">
+      <static>true</static>
+      <pose>9.605 6.049 -10.010 0 0 6.163</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/heliopora_coerulea.glb</uri>
+            <scale>0.9893 0.9893 0.9893</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c4.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P010_s2_intercalados_saudavel">
+      <static>true</static>
+      <pose>11.309 6.054 -10.010 0 0 3.039</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/meandrina_meandrites.glb</uri>
+            <scale>1.3471 1.3471 1.3471</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c2.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P011_s2_intercalados_branqueado">
+      <static>true</static>
+      <pose>13.163 6.092 -10.010 0 0 1.478</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/acropora_cervicornis.glb</uri>
+            <scale>22.7205 22.7205 22.7205</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P012_s2_intercalados_saudavel">
+      <static>true</static>
+      <pose>15.465 6.367 -10.010 0 0 0.809</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/acropora_palmata.glb</uri>
+            <scale>1.7702 1.7702 1.7702</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c1.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P013_s3a_aglom_puro_saudavel">
+      <static>true</static>
+      <pose>6.229 8.825 -10.010 0 0 2.132</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pseudodiploria_strigosa.glb</uri>
+            <scale>2.2747 2.2747 2.2747</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c5.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P014_s3a_aglom_puro_saudavel">
+      <static>true</static>
+      <pose>6.393 9.525 -10.010 0 0 0.106</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/leptoseris_gardineri.glb</uri>
+            <scale>2.2386 2.2386 2.2386</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c1.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P015_s3a_aglom_puro_saudavel">
+      <static>true</static>
+      <pose>5.423 9.114 -10.003 0 0 1.004</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pocillopora_damicornis.glb</uri>
+            <scale>3.0106 3.0106 3.0106</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c4.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P016_s3a_aglom_puro_saudavel">
+      <static>true</static>
+      <pose>5.691 8.100 -10.010 0 0 6.261</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/acropora_cervicornis.glb</uri>
+            <scale>20.5262 20.5262 20.5262</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c4.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P017_s3a_aglom_puro_branqueado">
+      <static>true</static>
+      <pose>11.755 8.368 -9.331 0 0 5.059</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/meandrina_meandrites.glb</uri>
+            <scale>1.4223 1.4223 1.4223</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P018_s3a_aglom_puro_branqueado">
+      <static>true</static>
+      <pose>12.228 9.050 -8.870 0 0 1.195</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/leptoseris_gardineri.glb</uri>
+            <scale>2.3060 2.3060 2.3060</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P019_s3a_aglom_puro_branqueado">
+      <static>true</static>
+      <pose>12.288 9.810 -8.843 0 0 0.584</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/leptoseris_gardineri.glb</uri>
+            <scale>2.7133 2.7133 2.7133</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P020_s3a_aglom_puro_branqueado">
+      <static>true</static>
+      <pose>12.933 9.159 -9.430 0 0 0.113</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/meandrina_meandrites.glb</uri>
+            <scale>1.4211 1.4211 1.4211</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P021_s3b_aglom_misto_branqueado">
+      <static>true</static>
+      <pose>6.423 11.440 -10.010 0 0 4.156</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/meandrina_meandrites.glb</uri>
+            <scale>1.3601 1.3601 1.3601</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P022_s3b_aglom_misto_saudavel">
+      <static>true</static>
+      <pose>5.814 12.428 -9.782 0 0 4.350</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/meandrina_meandrites.glb</uri>
+            <scale>1.5347 1.5347 1.5347</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c1.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P023_s3b_aglom_misto_saudavel">
+      <static>true</static>
+      <pose>6.837 12.215 -10.010 0 0 4.908</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/seriatopora_hystrix.glb</uri>
+            <scale>0.0018 0.0018 0.0018</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c1.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P024_s3b_aglom_misto_saudavel">
+      <static>true</static>
+      <pose>5.174 11.756 -10.010 0 0 5.828</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/seriatopora_hystrix.glb</uri>
+            <scale>0.0015 0.0015 0.0015</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c3.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P025_s3b_aglom_misto_branqueado">
+      <static>true</static>
+      <pose>11.645 12.133 -9.183 0 0 0.243</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pseudodiploria_strigosa.glb</uri>
+            <scale>2.6467 2.6467 2.6467</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P026_s3b_aglom_misto_saudavel">
+      <static>true</static>
+      <pose>12.700 11.455 -8.616 0 0 0.724</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/acropora_cervicornis.glb</uri>
+            <scale>22.5649 22.5649 22.5649</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/saudavel_c3.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P027_s3b_aglom_misto_branqueado">
+      <static>true</static>
+      <pose>12.850 12.192 -8.409 0 0 3.489</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pocillopora_damicornis.glb</uri>
+            <scale>3.1564 3.1564 3.1564</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P028_s3b_aglom_misto_branqueado">
+      <static>true</static>
+      <pose>12.090 12.776 -8.694 0 0 4.002</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/heliopora_coerulea.glb</uri>
+            <scale>1.1008 1.1008 1.1008</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/branqueado.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P029_s4_dificil_ambiguo">
+      <static>true</static>
+      <pose>5.000 15.000 -10.010 0 0 2.041</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pseudodiploria_strigosa.glb</uri>
+            <scale>2.3222 2.3222 2.3222</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/parcial_c4.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P030_s4_dificil_ambiguo">
+      <static>true</static>
+      <pose>7.000 15.000 -10.008 0 0 4.043</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/acropora_palmata.glb</uri>
+            <scale>1.4775 1.4775 1.4775</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/parcial_c2.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P031_s4_dificil_ambiguo">
+      <static>true</static>
+      <pose>9.000 15.000 -10.010 0 0 2.212</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/meandrina_meandrites.glb</uri>
+            <scale>1.5241 1.5241 1.5241</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/multicolor.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="cad_P032_s4_dificil_ambiguo">
+      <static>true</static>
+      <pose>11.000 15.000 -9.998 0 0 0.821</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><mesh>
+            <uri>model://bluerov2_description/models/coral_recife/pocillopora_damicornis.glb</uri>
+            <scale>3.3083 3.3083 3.3083</scale>
+          </mesh></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_prova_tex/multicolor.jpg</albedo_map>
+              <roughness>0.9</roughness><metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
