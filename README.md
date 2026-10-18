@@ -1,23 +1,38 @@
-# BlueROV2 ROS 2
+# bluerov2 (fork para mapeamento de corais)
 
-This repository contains the robot description and necessary launch files to describe and simulate the BlueROV2 (unmanned underwater vehicle) with [Gazebo](https://gazebosim.org/home) and its [hydrodynamics plugins](https://gazebosim.org/api/gazebo/6.1/underwater_vehicles.html) under ROS 2.
+## Visão geral
 
+Fork do pacote [bluerov2](https://github.com/CentraleNantesROV/bluerov2) (descrição e simulação do ROV BlueROV2 em
+ROS 2 e Gazebo) para simular o robô em mundos subaquáticos com corais, usando **ROS 2 Jazzy + Gazebo Harmonic em Docker**.
+Os mundos têm fundo de areia e corais em foto e em malha 3D, e geram imagens da câmera do robô e a verdade de terreno
+(posição e classe de cada coral) para testar um detector de corais saudáveis e branqueados e a montagem de um mapa de saúde.
 
----
+Esta branch (`feat/coral-world`) acrescenta ao projeto original: o ambiente Docker, três mundos de simulação, scripts que
+montam os mundos e as fotos, e os manifestos de verdade de terreno. A lista completa está em "O que este fork mudou".
 
-# Fork do projeto de corais: simulação em Docker (ROS 2 Jazzy + Gazebo Harmonic)
+## Licença
 
-Esta branch (`feat/coral-world`) adiciona um Docker pronto para rodar o BlueROV2 no Gazebo
-Harmonic, mais **três mundos subaquáticos** com fundo de areia e corais (tabela no Passo 4).
-Tudo abaixo foi escrito para quem **nunca rodou isso**: siga os passos na ordem.
+O código deste repositório é distribuído sob a licença **Apache-2.0** (arquivo [LICENSE](LICENSE), herdado do projeto original).
+Malhas 3D, texturas e fotos de terceiros têm licenças próprias, descritas em "Créditos e licenças".
 
-> O Dockerfile original deste repositório (raiz, `build_docker.sh`/`run_docker.sh`) usa ROS 2
-> Humble + Gazebo Fortress e foi mantido como está. **Use o da pasta [docker/](docker/)**.
-> Motivo: o Fortress 6.16 não reconhece os plugins `gz::sim::systems::Hydrodynamics`,
-> `Thruster` e `OdometryPublisher` usados no xacro atual (testado), então o robô ficaria sem
-> propulsores, hidrodinâmica e odometria.
+**Autor:** Bruno Cunha Lima  
+**Mantenedor:** Bruno Cunha Lima, cunhalimabruno@gmail.com  
+**Projeto original:** [CentraleNantesROV/bluerov2](https://github.com/CentraleNantesROV/bluerov2) (Apache-2.0)
 
-## O que você precisa (uma vez só)
+## Testado em
+
+- **ROS 2 Jazzy** e **Gazebo Harmonic 8.15**, dentro de Docker (imagem `ros:jazzy`).
+- Computador (host): **Ubuntu 22.04 LTS (Jammy)**, sessão X11.
+
+## Status do projeto
+
+| Repositório | Branch | ROS 2 | Gazebo | Testes automatizados |
+|---|---|---|---|---|
+| bluerov2 (fork) | `feat/coral-world` | Jazzy | Harmonic 8.15 | N/A |
+
+## Dependências
+
+No seu computador (host), uma vez só:
 
 - **Linux** com sessão gráfica (testado em Ubuntu 22.04, X11). O container usa `--net=host`,
   então não serve para Windows/macOS.
@@ -33,7 +48,39 @@ Tudo abaixo foi escrito para quem **nunca rodou isso**: siga os passos na ordem.
 - GPU NVIDIA é **opcional**. Por padrão o container usa a placa integrada (Intel/AMD) ou a CPU para renderizar; `./run.sh --gpu`
   (NVIDIA) exige o `nvidia-container-toolkit` e não foi testado.
 
-## Passo 1: baixar o código
+Dentro da imagem Docker (instalado por [docker/Dockerfile](docker/Dockerfile), nada a fazer): `ros-jazzy-ros-gz`, `xacro`,
+`simple-launch`, `slider-publisher`, `rviz2`, `rqt-image-view`; e, compilados do código-fonte em commits fixos,
+[thruster_manager](https://github.com/CentraleNantesROV/thruster_manager), [auv_control](https://github.com/CentraleNantesROV/auv_control)
+e [pose_to_tf](https://github.com/oKermorgant/pose_to_tf).
+
+> O Dockerfile original deste repositório (raiz, `build_docker.sh`/`run_docker.sh`) usa ROS 2 Humble + Gazebo Fortress e foi
+> mantido como está. **Use o da pasta [docker/](docker/)**. Motivo: o Fortress 6.16 não reconhece os plugins
+> `gz::sim::systems::Hydrodynamics`, `Thruster` e `OdometryPublisher` usados no xacro atual (testado), então o robô ficaria
+> sem propulsores, hidrodinâmica e odometria.
+
+## Estrutura do pacote
+
+```
+bluerov2/
+├─ bluerov2_description/   o robô e os mundos
+│  ├─ urdf/                xacro do robô (sensores, propulsores, hidrodinâmica)
+│  ├─ launch/              launches do robô e dos mundos
+│  ├─ worlds/              mundos (.sdf) e manifestos de verdade de terreno da prova
+│  ├─ models/              areia (sand_heightmap), malhas 3D CC0 (coral_recife) e texturas geradas (*_tex);
+│  │                       as pastas de fotos (coral_textures*) são criadas por scripts/setup_assets.sh e ficam fora do git
+│  └─ meshes/              malhas do robô
+├─ bluerov2_control/       configurações e launches dos controladores (PID, sliding mode)
+├─ docker/                 Dockerfile, build.sh e run.sh (ROS 2 Jazzy + Gazebo Harmonic)
+├─ scripts/                setup_assets.sh e demais scripts que montam as fotos, as malhas e os mundos
+├─ datasets/               datasets baixados por setup_assets.sh (criada na hora, ignorada pelo git)
+└─ README.md, LICENSE
+```
+
+## Instalação e execução
+
+Visão geral do fluxo: clonar → preparar as fotos → construir a imagem Docker → abrir o container → compilar e lançar um mundo.
+
+### Passo 1: baixar o código
 
 ```bash
 git clone -b feat/coral-world https://github.com/BrunoCL-0/bluerov2.git
@@ -52,7 +99,7 @@ Ele cria um ambiente virtual em `.venv-assets/` (não mexe no Python do sistema)
 `bluerov2_description/models/coral_textures/` e `models/coral_textures_prova/`, ambas ignoradas pelo git. Sem esse
 passo os mundos carregam normalmente, mas os planos de foto ficam sem imagem.
 
-## Passo 2: construir a imagem Docker (uma vez; 20 a 40 min dependendo da internet)
+### Passo 2: construir a imagem Docker (uma vez; 20 a 40 min dependendo da internet)
 
 ```bash
 cd docker
@@ -64,7 +111,7 @@ Isso cria a imagem `bluerov2_harmonic` com ROS 2 Jazzy, Gazebo Harmonic, `ros_gz
 (estes três compilados a partir de commits fixos, para o build ser reproduzível).
 Só repita este passo se mudar o `docker/Dockerfile`.
 
-## Passo 3: abrir o container (Terminal 1)
+### Passo 3: abrir o container (Terminal 1)
 
 ```bash
 cd bluerov2/docker      # (se ainda não estiver nela)
@@ -76,7 +123,7 @@ Você cai num prompt `root@...:/ws#`. **Todos os comandos dos passos seguintes s
 dentro do container**, a não ser que esteja escrito "no seu computador". O seu repositório
 aparece dentro dele em `/ws/src/bluerov2`: você edita os arquivos no computador normalmente.
 
-## Passo 4: compilar e subir a simulação (Terminal 1, dentro do container)
+### Passo 4: compilar e subir a simulação (Terminal 1, dentro do container)
 
 ```bash
 cd /ws
@@ -104,7 +151,7 @@ Detalhes de cada mundo nas seções abaixo.
 Depois de **editar** algum arquivo do pacote (mundo, xacro, launch), rode de novo
 `colcon build` e `source install/setup.bash` dentro do container antes de relançar.
 
-## Passo 5: conferir se está funcionando (Terminal 2)
+### Passo 5: conferir se está funcionando (Terminal 2)
 
 Abra **outro terminal no seu computador** e entre no mesmo container:
 
@@ -121,7 +168,7 @@ ros2 topic hz /bluerov2/image         # câmera, ~20 Hz
 ros2 run rqt_image_view rqt_image_view   # escolha /bluerov2/image
 ```
 
-### Mexer no robô com sliders (não testado)
+#### Mexer no robô com sliders (não testado)
 
 Suba o mundo **sem** o robô e spawne o robô com sliders:
 
@@ -133,6 +180,24 @@ ros2 launch bluerov2_description upload_bluerov2_launch.py sliders:=true z:=-5.
 ```
 
 Aparece uma janela com um slider por propulsor (±40 N) e outro para inclinar a câmera.
+
+## Arquivos de launch
+
+Todos rodam dentro do container, depois de `colcon build` e `source install/setup.bash`.
+
+| Pacote | Launch | Para que serve | Argumentos principais |
+|---|---|---|---|
+| `bluerov2_description` | `coral_world_textura_launch.py` | mundo com 8 planos de foto | `gui`, `spawn`, `depth` |
+| `bluerov2_description` | `coral_world_recife_launch.py` | mundo com 96 corais 3D em aglomerados | `gui`, `spawn`, `depth` |
+| `bluerov2_description` | `coral_world_prova_launch.py` | mundo de prova (fotos e corais 3D, com morros) | `gui`, `spawn`, `depth` |
+| `bluerov2_description` | `world_launch.py` | mundo original, só água | `gui`, `spawn` |
+| `bluerov2_description` | `upload_bluerov2_launch.py` | cria o robô no mundo em execução | `namespace`, `sliders`, `x`, `y`, `z`, `ground_truth`, `camera` |
+| `bluerov2_control` | `cascaded_pids_launch.py` | controlador PID em cascata | `namespace`, `sliders`, `rviz` |
+| `bluerov2_control` | `sliding_mode_launch.py` | controlador por modos deslizantes (não testado) | `namespace`, `sliders`, `rviz` |
+| `bluerov2_control` | `wrench_launch.py` | comando direto de força e torque (não testado) | `namespace`, `sliders`, `rviz` |
+
+`gui:=false` roda só o servidor (sem janela); `depth:=-8.` muda a profundidade inicial do robô (em metros, z negativo);
+`spawn:=false` sobe o mundo sem o robô.
 
 ## Controlar o robô pelo teclado e ver a câmera
 
@@ -364,6 +429,10 @@ que declara MIT no `package.xml`), cujo `model.sdf` traz o cabeçalho do UUV Sim
 (Apache-2.0). A textura é de texturelib.com (uso livre, comercial ou não; não pode ser
 redistribuída sozinha; pede crédito). Detalhes em `models/sand_heightmap/README.md` e
 `models/sand_heightmap/materials/TEXTURE_LICENSE.txt`. Cite essas fontes no artigo.
+
+## Bugs e solicitações de recursos
+
+Relate problemas e peça novidades pelo [Issue Tracker](https://github.com/BrunoCL-0/bluerov2/issues) do repositório.
 
 ---
 
