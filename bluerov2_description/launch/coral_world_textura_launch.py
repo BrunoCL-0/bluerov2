@@ -9,10 +9,10 @@ def generate_launch_description():
     sl.declare_arg('depth', default_value=-5.)  # z inicial do robô: entre a água (0) e a areia (-10 a -7.5)
 
     with sl.group(if_arg='gui'):
-        sl.gz_launch(sl.find('bluerov2_description', 'coral_world.sdf'), "-r")
+        sl.gz_launch(sl.find('bluerov2_description', 'coral_world_textura.sdf'), "-r")
         
     with sl.group(unless_arg='gui'):
-        sl.gz_launch(sl.find('bluerov2_description', 'coral_world.sdf'), "-r -s")
+        sl.gz_launch(sl.find('bluerov2_description', 'coral_world_textura.sdf'), "-r -s")
 
     bridges = [GazeboBridge.clock(),
                GazeboBridge('/ocean_current', '/current', 'geometry_msgs/Vector3',

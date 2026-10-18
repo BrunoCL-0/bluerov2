@@ -1,0 +1,237 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="ocean">
+
+    <scene>
+      <grid>false</grid>
+    </scene>
+
+
+    <physics name="10ms" type="ode">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+    <plugin
+      filename="gz-sim-imu-system"
+      name="gz::sim::systems::Imu">
+    </plugin>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin
+      filename="gz-sim-buoyancy-system"
+      name="gz::sim::systems::Buoyancy">
+      <graded_buoyancy>
+        <default_density>1000</default_density>
+        <density_change>
+          <above_depth>0</above_depth>
+          <density>1</density>
+        </density_change>
+      </graded_buoyancy>
+    </plugin>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.5 0.5 0.5 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="water_plane">
+      <static>true</static>
+      <link name="link">
+        <visual name="water_plane">
+          <geometry>
+            <plane>
+              <size>100 100</size>
+              <normal>0 0 1</normal>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0 0 1 0.5</ambient>
+            <diffuse>0 0 1 0.5</diffuse>
+            <specular>0 0 1 0.5</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <!-- fundo de areia: 50x50 m, relevo de ~2.5 m. Base em z=-10, topo dos morros em ~ -7.5 m (abaixo da água, z=0) -->
+    <include>
+      <uri>model://bluerov2_description/models/sand_heightmap</uri>
+      <name>seabed</name>
+      <pose>0 0 -10 0 0 0</pose>
+    </include>
+
+
+    <!-- TESTE A (textura): fotos de coral como textura em planos de ~0,6 m sobre trechos planos do fundo.
+         As imagens NÃO estão no repositório (ver README, "Texturas de coral"): rode
+         scripts/setup_coral_textures.py. Sem elas o mundo carrega, mas os planos ficam sem foto. -->
+    <model name="textura_saudavel_vermelho_1">
+      <static>true</static>
+      <pose>3.00 -2.00 -9.967 0 0 0.000</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures/saudavel_vermelho_1.png</albedo_map>
+              <roughness>0.9</roughness>
+              <metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="textura_branqueado_1">
+      <static>true</static>
+      <pose>3.00 -4.00 -9.985 0 0 0.436</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures/branqueado_1.png</albedo_map>
+              <roughness>0.9</roughness>
+              <metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="textura_saudavel_verde_1">
+      <static>true</static>
+      <pose>5.25 0.50 -9.978 0 0 -0.262</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.462</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures/saudavel_verde_1.jpg</albedo_map>
+              <roughness>0.9</roughness>
+              <metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="textura_branqueado_2">
+      <static>true</static>
+      <pose>3.00 -6.00 -9.985 0 0 0.698</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures/branqueado_2.png</albedo_map>
+              <roughness>0.9</roughness>
+              <metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="textura_saudavel_verde_2">
+      <static>true</static>
+      <pose>4.75 -3.00 -9.959 0 0 0.175</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures/saudavel_verde_2.png</albedo_map>
+              <roughness>0.9</roughness>
+              <metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="textura_branqueado_3">
+      <static>true</static>
+      <pose>4.50 4.50 -9.983 0 0 -0.524</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.45</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures/branqueado_3.jpg</albedo_map>
+              <roughness>0.9</roughness>
+              <metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="textura_saudavel_vermelho_2">
+      <static>true</static>
+      <pose>5.75 2.50 -9.985 0 0 0.349</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures/saudavel_vermelho_2.png</albedo_map>
+              <roughness>0.9</roughness>
+              <metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="textura_branqueado_4">
+      <static>true</static>
+      <pose>7.25 0.00 -9.985 0 0 -0.175</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>0.6 0.6</size></plane></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <pbr><metal>
+              <albedo_map>model://bluerov2_description/models/coral_textures/branqueado_4.png</albedo_map>
+              <roughness>0.9</roughness>
+              <metalness>0.0</metalness>
+            </metal></pbr>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

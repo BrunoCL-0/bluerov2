@@ -68,3 +68,10 @@ Thumbs.db
 *.tex.backup
 
 !.gitignore
+
+# Texturas de coral: fotos de datasets do Kaggle sem licença clara, ficam só na máquina de cada pessoa
+# (recriar com scripts/setup_assets.sh)
+bluerov2_description/models/coral_textures/
+datasets/
+bluerov2_description/models/coral_textures_prova/
+.venv-assets/
