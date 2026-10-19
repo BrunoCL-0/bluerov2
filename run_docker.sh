@@ -2,7 +2,7 @@
 
 set -e
 
-IMAGE_NAME=bluerov2_ros2
+IMAGE_NAME=bluerov2_harmonic
 CONTAINER_NAME=bluerov2_ros2
 
 USE_GPU=false
@@ -36,27 +36,38 @@ if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
 fi
 
 # -------------------------------------------------
-# Base docker run command
+# Descobrir o diretório raiz do projeto no Host
 # -------------------------------------------------
-DOCKER_CMD="docker run -it \
-  --name ${CONTAINER_NAME} \
-  --net=host \
-  --ipc=host \
-  --privileged \
-  --env DISPLAY=${DISPLAY} \
-  --env QT_X11_NO_MITSHM=1 \
-  --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
-  --volume /dev:/dev"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo "[INFO] Mounting project directory: ${PROJECT_DIR}"
+
+# -------------------------------------------------
+# Montar flags base do Docker
+# -------------------------------------------------
+DOCKER_ARGS=(
+  -it
+  --name "${CONTAINER_NAME}"
+  --net=host
+  --ipc=host
+  --privileged
+  --env DISPLAY="${DISPLAY}"
+  --env QT_X11_NO_MITSHM=1
+  --volume /tmp/.X11-unix:/tmp/.X11-unix:rw
+  --volume /dev:/dev
+  --volume "${PROJECT_DIR}:/ws/src:rw"
+)
 
 # -------------------------------------------------
 # Optional GPU support
 # -------------------------------------------------
 if [ "${USE_GPU}" = true ]; then
   echo "[INFO] Running with GPU support enabled"
-  DOCKER_CMD="${DOCKER_CMD} \
-    --gpus all \
-    --env NVIDIA_VISIBLE_DEVICES=all \
-    --env NVIDIA_DRIVER_CAPABILITIES=all"
+  DOCKER_ARGS+=(
+    --gpus all
+    --env NVIDIA_VISIBLE_DEVICES=all
+    --env NVIDIA_DRIVER_CAPABILITIES=all
+  )
 else
   echo "[INFO] Running without GPU support"
 fi
@@ -64,4 +75,4 @@ fi
 # -------------------------------------------------
 # Run container
 # -------------------------------------------------
-exec ${DOCKER_CMD} ${IMAGE_NAME}
+exec docker run "${DOCKER_ARGS[@]}" "${IMAGE_NAME}"
