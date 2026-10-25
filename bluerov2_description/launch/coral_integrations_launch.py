@@ -42,5 +42,8 @@ def generate_launch_description():
     )
     
     sl.add_action(delayed_pid)
+    
+    # # 4. Nó de Coleta e Inferência de Corais (CoralCollectorNode)
+    # sl.node('bluerov2_integration', 'coral_collector_node', output='screen')
 
     return sl.launch_description()
