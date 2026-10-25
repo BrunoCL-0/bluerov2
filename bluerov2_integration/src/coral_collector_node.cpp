@@ -2,7 +2,7 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 // Se for usar OpenCV para converter a imagem:
-#include <cv_bridge/cv_bridge.h>
+#include <cv_bridge/cv_bridge.hpp>
 #include <opencv2/opencv.hpp>
 
 class CoralCollectorNode : public rclcpp::Node
@@ -23,7 +23,7 @@ public:
             "/bluerov2/pose_gt", 10,
             std::bind(&CoralCollectorNode::poseCallback, this, std::placeholders::_1));
 
-        RCLCPP_INFO(this->get_node_logger(), "Coral Collector Node em C++ iniciado com sucesso!");
+        RCLCPP_INFO(this->get_logger(), "Coral Collector Node em C++ iniciado com sucesso!");
     }
 
 private:
@@ -34,7 +34,7 @@ private:
         has_pose_ = true;
         
         // Exemplo de leitura das coordenadas X, Y, Z globais
-        // RCLCPP_INFO_THROTTLE(this->get_node_logger(), *this->get_clock(), 2000,
+        // RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
         //     "Posição atual -> X: %.2f, Y: %.2f, Z: %.2f", 
         //     latest_pose_.position.x, latest_pose_.position.y, latest_pose_.position.z);
     }
@@ -42,7 +42,7 @@ private:
     void imageCallback(const sensor_msgs::msg::Image::SharedPtr msg)
     {
         if (!has_pose_) {
-            RCLCPP_WARN_THROTTLE(this->get_node_logger(), *this->get_clock(), 2000,
+            RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
                 "Aguardando a primeira pose do robô chegar...");
             return;
         }
@@ -56,13 +56,13 @@ private:
             // 2. Juntar com as coordenadas de 'latest_pose_'
             // 3. Enviar para a sua API web (ex: via libcurl ou cpp-httplib)
 
-            RCLCPP_INFO_THROTTLE(this->get_node_logger(), *this->get_clock(), 3000,
+            RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 3000,
                 "Frame recebido (%dx%d) sincronizado com a pose (X=%.2f, Y=%.2f)",
                 cv_image.cols, cv_image.rows, 
                 latest_pose_.position.x, latest_pose_.position.y);
 
         } catch (cv_bridge::Exception& e) {
-            RCLCPP_ERROR(this->get_node_logger(), "Erro no cv_bridge: %s", e.what());
+            RCLCPP_ERROR(this->get_logger(), "Erro no cv_bridge: %s", e.what());
         }
     }
 
